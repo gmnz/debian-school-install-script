@@ -1,0 +1,1 @@
+# debian-school-install-script
