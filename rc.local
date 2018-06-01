@@ -1,0 +1,110 @@
+#!/bin/sh -e
+#
+# rc.local
+#
+# This script is executed at the end of each multiuser runlevel.
+# Make sure that the script will "exit 0" on success or any other
+# value on error.
+#
+# In order to enable or disable this script just change the execution
+# bits.
+#
+# By default this script does nothing.
+
+if [ -f /pisomkujeme ]; then
+
+  #rm /pisomkujeme
+
+  #/root/bin/blockint.sh
+  #/root/bin/blockusb.sh
+  iptables -A INPUT -m state --state ESTABLISHED -j ACCEPT
+  iptables -A OUTPUT -m state --state ESTABLISHED -j ACCEPT
+
+  iptables -A INPUT -m state --state NEW -m tcp -p tcp -m multiport --dports 5800:5803,5900:5903,6000:6003 -j ACCEPT
+  #iptables -A OUTPUT -m state --state ESTABLISHED -m tcp -p tcp -m multiport --sports 5800:5803,5900:5903,6000:6003 -j ACCEPT
+
+
+
+  #iptables -A INPUT -p tcp --dport 5900 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+  #iptables -A OUTPUT -p tcp --sport 5900 -m conntrack --ctstate ESTABLISHED -j ACCEPT
+  #iptables -A INPUT -p tcp --dport 5901 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+  #iptables -A OUTPUT -p tcp --sport 5901 -m conntrack --ctstate ESTABLISHED -j ACCEPT
+  #iptables -A INPUT -p tcp --dport 5800 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+  #iptables -A OUTPUT -p tcp --sport 5800 -m conntrack --ctstate ESTABLISHED -j ACCEPT
+  #iptables -A INPUT -p tcp --dport 5801 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+  #iptables -A OUTPUT -p tcp --sport 5801 -m conntrack --ctstate ESTABLISHED -j ACCEPT
+  #iptables -A INPUT -p tcp --dport 6000 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+  #iptables -A OUTPUT -p tcp --sport 6000 -m conntrack --ctstate ESTABLISHED -j ACCEPT
+  #iptables -A INPUT -p tcp --dport 6001 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+  #iptables -A OUTPUT -p tcp --sport 6001 -m conntrack --ctstate ESTABLISHED -j ACCEPT
+
+  iptables -A INPUT -p tcp --dport 22 -m conntrack --ctstate NEW -j ACCEPT
+  #iptables -A OUTPUT -p tcp --sport 22 -m conntrack --ctstate ESTABLISHED -j ACCEPT
+
+  iptables -P INPUT DROP
+  iptables -P OUTPUT DROP
+  iptables -P FORWARD DROP
+
+
+
+  ## Allow loopback
+  iptables -I INPUT 1 -i lo -j ACCEPT
+  #
+  ## Allow DNS
+  ##iptables -A OUTPUT -p udp --dport 53 -j ACCEPT
+  #iptables -A OUTPUT -p udp --dport 53 -j ACCEPT
+  #iptables -A INPUT -p udp --sport 53 -j ACCEPT
+  #
+  #
+  ## Now, allow connection to website serverfault.com on port 80
+  #iptables -A OUTPUT -p tcp -d pisomky.6f.sk -j ACCEPT
+  #iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+  #
+  #iptables -A INPUT -p tcp --dport 22 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+  #iptables -A OUTPUT -p tcp --sport 22 -m conntrack --ctstate ESTABLISHED -j ACCEPT
+  #
+  ## Drop everything
+  #iptables -P INPUT DROP
+  #iptables -P OUTPUT DROP
+
+
+
+
+  #	iptables -A OUTPUT -p udp --dport 53 -j ACCEPT
+  #	iptables -A INPUT -p udp --sport 53 -j ACCEPT
+  #	iptables -A OUTPUT -p tcp -d pisomky.6f.sk -j ACCEPT
+  #    iptables -A INPUT -p tcp --dport 22 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+  #    iptables -A OUTPUT -p tcp --sport 22 -m conntrack --ctstate ESTABLISHED -j ACCEPT
+  #	iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+  #	iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+  #    iptables --policy INPUT DROP
+  #    iptables --policy OUTPUT DROP
+  #    iptables --policy FORWARD DROP
+          #iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+          #iptables -A OUTPUT -p tcp --dport 443 -j DROP #HTTPS
+          #iptables -A OUTPUT -p tcp --dport 80 -j DROP #HTTP
+          #iptables -A OUTPUT -p tcp --dport 0:1000 -j DROP #HTTP
+
+  if [ ! -d /root/blockusb ]; then
+    mkdir /root/blockusb
+  fi
+  for i in $(ls /lib/modules/); do
+    mv /lib/modules/$i/kernel/drivers/usb/storage/usb-storage.ko /root/blockusb/usb-storage.ko-$i 
+  done
+else
+  for i in $(ls /lib/modules/); do
+          mv /root/blockusb/usb-storage.ko-$i /lib/modules/$i/kernel/drivers/usb/storage/usb-storage.ko 
+  done
+  
+  iptables -F
+  iptables -X
+  iptables -t nat -F
+  iptables -t nat -X
+  iptables -t mangle -F
+  iptables -t mangle -X
+  iptables -P INPUT ACCEPT
+  iptables -P FORWARD ACCEPT
+  iptables -P OUTPUT ACCEPT
+fi
+
+exit 0

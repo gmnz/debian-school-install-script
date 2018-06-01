@@ -1,0 +1,3 @@
+#!/bin/bash
+sleep 30s
+/usr/bin/x11vnc -auth guess -forever -loop -noxdamage -repeat -shared -nopw

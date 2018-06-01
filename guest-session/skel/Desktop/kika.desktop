@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Name=Pripojiť na KIKU
+#Comment=Pripojiť na KIKU
+Exec=/bin/bash -c "~/.bin/prihl.sh"
+#Path=/home/samuel/ugene-1.11.5/
+Icon=/usr/share/icons/gnome/32x32/places/folder-remote.png
+Terminal=false
+Type=Application
+#Categories=Utility;Application;Development;
