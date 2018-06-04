@@ -21,7 +21,7 @@ apt-get -yq install linux-image-amd64 grub-pc
 grub-install /dev/sda
 grub-mkconfig -o /boot/grub/grub.cfg
 
-apt-get -yq install task-lxde-desktop vim openssh-server git codeblocks
+apt-get -yq install task-lxde-desktop vim openssh-server git codeblocks g++
 
 cd /etc/lightdm/
 git clone https://gist.github.com/pixline/6981710 
