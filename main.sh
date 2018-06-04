@@ -19,9 +19,7 @@ if [ -z $PARTN ]; then
           parted /dev/sda -s -- rm 4
           PEND=$(parted /dev/sda -s -- p | tail -n 2 | head -n 1 | awk '{ print $3 }' | awk -F. '{ print $1 }' | awk -F'G' ' { print $1 }')
         elif fdisk -l /dev/sda | grep -q -e FAT -e NTFS; then
-
           PEND=$(parted /dev/sda -s -- p | tail -n 2 | head -n 1 | awk '{ print $3 }' | awk -F. '{ print $1 }' | awk -F'G' ' { print $1 }')
-
           if [ $PEND -eq $DSIZE ]; then
             PARTN=$(echo "$DTAB" | tail -n 1 | awk '{ print $1 }')
             echo $PARTN $PEND
@@ -29,13 +27,17 @@ if [ -z $PARTN ]; then
             echo ", -14G" | sfdisk -N ${PARTN: -1} /dev/sda
             PEND=$(parted /dev/sda -s -- p | tail -n 2 | head -n 1 | awk '{ print $3 }' | awk -F. '{ print $1 }' | awk -F'G' ' { print $1 }')
           fi
-
+          UNIT="GB"
+          PSIZE=$((PEND+10))
+        else
+          PEND="1"
+          UNIT="MB"
+          PSIZE=$((DSIZE-4))
+          parted /dev/sda -s -- mklabel msdos
 	fi
-
-        parted /dev/sda -s -- mkpart extended $((PEND))"GB" 100%
-        parted /dev/sda -s -- mkpart logical ext4 $((PEND))"GB" $((PEND+10))"GB"
-        parted /dev/sda -s -- mkpart logical linux-swap $((PEND+10))"GB" 100%
-
+        parted /dev/sda -s -- mkpart extended $PEND$UNIT 100%
+        parted /dev/sda -s -- mkpart logical ext4 $PEND$UNIT $PSIZE"GB"
+        parted /dev/sda -s -- mkpart logical linux-swap $PSIZE"GB" 100%
 fi
 
 SWAPP=$(echo "$DTAB" | grep "Linux swap" | awk '{ print $1 }')
