@@ -21,6 +21,19 @@ apt-get -yq install linux-image-amd64 grub-pc
 grub-install /dev/sda
 grub-mkconfig -o /boot/grub/grub.cfg
 
+
+cat >> /etc/grub.d/00_header <<EOL
+
+cat << EOF
+set superusers="root"
+password_pbkdf2 root grub.pbkdf2.sha512.10000.CAEE0B6E03B95C1CA57F923BEAEA056EB9737A947D2C7FC13FB86E396F6F9CFA444EA31E8DE6AA00321CC0EC998F7E9D39D5B193804D0F047822B0D99F7FAE5D.635FF8AFF5EF6BF4804053AD361843DD526559346271EB109B8E76F5FB5DA40A3C00347027110F0D840D74EE0BE366D8C0902E795F6858E6B3A95FB1EC813DAF
+export superusers
+EOF
+EOL
+
+sed -i "s/--class gnu --class os/--class gnu --class os --unrestricted/g" /etc/grub.d/10_linux
+update-grub
+
 apt-get -yq install task-lxde-desktop vim openssh-server git codeblocks codeblocks-contrib g++ unattended-upgrades
 
 sed -i -- 's/\/\/Unattended-Upgrade::Mail "root"/Unattended-Upgrade::Mail "root"/g' /etc/apt/apt.conf.d/50unattended-upgrades
