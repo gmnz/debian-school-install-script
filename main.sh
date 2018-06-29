@@ -47,6 +47,7 @@ yes | mkfs.ext4 $PARTN
 #starts even if it makes no sense
 #mkfs.ext4 -F $PARTN
 
+if [ -n "$(swapon -s)" ]; then swapoff $SWAPP; fi
 yes | mkswap $SWAPP
 swapon $SWAPP
 
