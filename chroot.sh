@@ -36,6 +36,12 @@ update-grub
 
 apt-get -yq install task-lxde-desktop vim openssh-server git codeblocks codeblocks-contrib g++ unattended-upgrades
 
+wget https://sites.google.com/site/virtualcide/virtualc_1.8.0_i386.deb?attredirects=0 -O virtualc.deb
+dpkg --add-architecture i386
+apt-get install gdebi
+gdebi --n virtualc.deb
+rm virtualc.deb
+
 sed -i -- 's/\/\/Unattended-Upgrade::Mail "root"/Unattended-Upgrade::Mail "root"/g' /etc/apt/apt.conf.d/50unattended-upgrades
 
 cd /etc/lightdm/
