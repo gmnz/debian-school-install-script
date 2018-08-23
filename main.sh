@@ -62,6 +62,7 @@ mount -t proc none /mnt/proc
 mount -t sysfs sys /mnt/sys
 
 cp chroot.sh /mnt/chroot.sh 
+cp scratch2-install.sh /mnt/scratch2-install.sh 
 chroot /mnt ./chroot.sh $PARTN $SWAPP $HOSTNAME $PASSWD
 
 cp -r guest-session /mnt/etc/

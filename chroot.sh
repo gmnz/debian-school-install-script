@@ -42,6 +42,8 @@ apt-get install gdebi
 gdebi --n virtualc.deb
 rm virtualc.deb
 
+./scratch2-install.sh
+
 sed -i -- 's/\/\/Unattended-Upgrade::Mail "root"/Unattended-Upgrade::Mail "root"/g' /etc/apt/apt.conf.d/50unattended-upgrades
 
 cd /etc/lightdm/
