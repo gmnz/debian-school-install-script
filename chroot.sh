@@ -38,7 +38,7 @@ apt-get -yq install task-lxde-desktop vim openssh-server git codeblocks codebloc
 
 wget https://sites.google.com/site/virtualcide/virtualc_1.8.0_i386.deb?attredirects=0 -O virtualc.deb
 dpkg --add-architecture i386
-apt-get install gdebi
+apt-get -yq install gdebi
 gdebi --n virtualc.deb
 rm virtualc.deb
 

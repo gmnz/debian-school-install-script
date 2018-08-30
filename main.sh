@@ -9,7 +9,8 @@ echo -n "root passwd: "
 read -s PASSWD
 echo
 
-umount /dev/sda?
+umount /dev/sda? || echo "sda unmounted"
+echo
 
 #(fdisk -l /dev/sda)=$(fdisk -l /dev/sda)
 LINPART=$(echo "$(fdisk -l /dev/sda)" | grep -e Linux | grep -v "Linux swap" | awk '{ print $1 }')
