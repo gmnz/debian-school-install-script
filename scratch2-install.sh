@@ -27,7 +27,7 @@ cd /tmp/
 unzip -o /tmp/Scratch-456.0.1.air
 cp /tmp/icons/AppIcon128.png /opt/adobe-air-sdk/scratch/scratch.png
 
-cat > $HOME/Scratch2.desktop <<'EOF'
+cat > /usr/share/applications/Scratch2.desktop <<'EOF'
 [Desktop Entry]
 Encoding=UTF-8
 Version=1.0
