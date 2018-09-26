@@ -34,7 +34,7 @@ EOL
 sed -i "s/--class gnu --class os/--class gnu --class os --unrestricted/g" /etc/grub.d/10_linux
 update-grub
 
-apt-get -yq install task-lxde-desktop vim openssh-server git codeblocks codeblocks-contrib g++ unattended-upgrades
+apt-get -yq install task-lxde-desktop vim openssh-server x11vnc git codeblocks codeblocks-contrib g++ unattended-upgrades
 
 wget https://sites.google.com/site/virtualcide/virtualc_1.8.0_i386.deb?attredirects=0 -O virtualc.deb
 dpkg --add-architecture i386
@@ -45,6 +45,8 @@ rm virtualc.deb
 ./scratch2-install.sh
 
 sed -i -- 's/\/\/Unattended-Upgrade::Mail "root"/Unattended-Upgrade::Mail "root"/g' /etc/apt/apt.conf.d/50unattended-upgrades
+
+chmod +x /etc/guest-session/skel/.bin/*
 
 cd /etc/lightdm/
 git clone https://gist.github.com/pixline/6981710 
