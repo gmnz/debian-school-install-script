@@ -16,9 +16,15 @@ echo
 LINPART=$(echo "$(fdisk -l /dev/sda)" | grep -e Linux | grep -v "Linux swap" | awk '{ print $1 }')
 DSIZE=$(parted /dev/sda -s -- p | grep Disk | head -n 1 | awk '{ print $3 }' | awk -F'G' '{ print $1 }'| awk -F'.' '{ print $1 }')
 
+#if there are more Linux partitions delete it all
+#NOT TESTED YET
+#if [ $(echo $LINPART | wc -l) -gt 1 ]; then
+#	parted /dev/sda -s -- mklabel msdos
+#fi
+
 if [ -z $LINPART ]; then
   	PEND=$(parted /dev/sda -s -- p | tail -n 2 | head -n 1 | awk '{ print $3 }' | awk -F. '{ print $1 }' | awk -F'G' ' { print $1 }')
-	while (echo $PEND | grep -v MB); do
+	while ((echo $PEND | grep -qv MB) && [ $PEND != "End" ]); do
 	  if [ $((DSIZE - PEND)) -lt 25 ]; then
 	    PARTN=$(echo "$(fdisk -l /dev/sda)" | grep sda | grep -v Disk | wc -l)
 	    echo "Deleting partition $PARTN..."
@@ -44,9 +50,17 @@ if [ -z $LINPART ]; then
         #  parted /dev/sda -s -- mklabel msdos
 	#fi
 	PEND=$(parted /dev/sda -s -- p | tail -n 2 | head -n 1 | awk '{ print $3 }')
-	echo $PEND
+	#echo $PEND
+	if [ $PEND == "End" ]; then
+		PEND=1
+		UNIT=MiB
+	fi
+
 	PSIZE=$((DSIZE-5))
         parted /dev/sda -s -- mkpart extended $PEND$UNIT 100%
+	if [ $PEND == "1" ]; then
+		PEND=2
+	fi
         parted /dev/sda -s -- mkpart logical ext4 $PEND$UNIT $PSIZE"GB"
         parted /dev/sda -s -- mkpart logical linux-swap $PSIZE"GB" 100%
 fi
