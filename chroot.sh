@@ -46,6 +46,7 @@ rm virtualc.deb
 
 sed -i -- 's/\/\/Unattended-Upgrade::Mail "root"/Unattended-Upgrade::Mail "root"/g' /etc/apt/apt.conf.d/50unattended-upgrades
 
+chmod +x /etc/rc.local
 chmod +x /etc/guest-session/skel/.bin/*
 
 cd /etc/lightdm/
