@@ -22,7 +22,10 @@ DSIZE=$(parted /dev/sda -s -- p | grep Disk | head -n 1 | awk '{ print $3 }' | a
 #	parted /dev/sda -s -- mklabel msdos
 #fi
 
-if [ -z $LINPART ]; then
+#echo "!.. $LINPART ..!"
+#cat fsdjaflsdj
+
+if [ -z "$LINPART" ]; then
   	PEND=$(parted /dev/sda -s -- p | tail -n 2 | head -n 1 | awk '{ print $3 }' | awk -F. '{ print $1 }' | awk -F'G' ' { print $1 }')
 	while ((echo $PEND | grep -qv MB) && [ $PEND != "End" ]); do
 	  if [ $((DSIZE - PEND)) -lt 25 ]; then
@@ -73,8 +76,10 @@ yes | mkfs.ext4 $LINPART
 #mkfs.ext4 -F $LINPART
 
 if [ -n "$(swapon -s)" ]; then swapoff $SWAPP; fi
-yes | mkswap $SWAPP
-swapon $SWAPP
+if [ -z "$SWAPP" ]; then
+	yes | mkswap $SWAPP
+	swapon $SWAPP
+fi
 
 mount $LINPART /mnt
 
