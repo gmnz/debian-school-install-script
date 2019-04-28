@@ -91,15 +91,15 @@ mount --bind /dev /mnt/dev
 mount -t proc none /mnt/proc
 mount -t sysfs sys /mnt/sys
 
-chmod +x chroot.sh	
-cp chroot.sh /mnt/chroot.sh 
-cp scratch2-install.sh /mnt/scratch2-install.sh 
-chroot /mnt ./chroot.sh $LINPART $SWAPP $HOSTNAME $PASSWD
-
 cp -r guest-session /mnt/etc/
 mkdir /mnt/root/.ssh
 cp authorized_keys /mnt/root/.ssh/authorized_keys
 cp rc.local /mnt/etc/
+
+chmod +x chroot.sh	
+cp chroot.sh /mnt/chroot.sh 
+cp scratch2-install.sh /mnt/scratch2-install.sh 
+chroot /mnt ./chroot.sh $LINPART $SWAPP $HOSTNAME $PASSWD
 
 read -p "Press Enter to reboot"
 
