@@ -61,6 +61,10 @@ sed -i -- 's/#PermitRootLogin prohibit-password/PermitRootLogin prohibit-passwor
 
 echo "set -o vi" >> /root/.bashrc
 
+echo "LANGUAGE=sk_SK.UTF-8
+LANG=sk_SK.UTF-8
+LC_ALL=sk_SK.UTF-8" >> /etc/default/locale
+
 echo "virtualc"
 
 wget "https://sites.google.com/site/virtualcide/virtualc_1.8.0_i386.deb?attredirects=0" -O virtualc.deb
