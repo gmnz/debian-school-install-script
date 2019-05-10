@@ -36,12 +36,6 @@ update-grub
 
 apt-get -yq install task-lxde-desktop vim openssh-server x11vnc git codeblocks codeblocks-contrib g++ unattended-upgrades geany geany-plugins gedit gedit-plugins bluefish bluefish-plugins
 
-wget "https://sites.google.com/site/virtualcide/virtualc_1.8.0_i386.deb?attredirects=0" -O virtualc.deb
-dpkg --add-architecture i386
-apt-get -yq install gdebi
-gdebi --n virtualc.deb
-rm virtualc.deb
-
 ./scratch2-install.sh
 
 sed -i -- 's/\/\/Unattended-Upgrade::Mail "root"/Unattended-Upgrade::Mail "root"/g' /etc/apt/apt.conf.d/50unattended-upgrades
@@ -64,3 +58,13 @@ sed -i -- 's/#autologin-guest=false/autologin-guest=true/g' /etc/lightdm/lightdm
 
 sed -i -- 's/#PasswordAuthentication yes/PasswordAuthentication no/g' /etc/ssh/sshd_config
 sed -i -- 's/#PermitRootLogin prohibit-password/PermitRootLogin prohibit-password/g' /etc/ssh/sshd_config
+
+echo "virtualc"
+
+wget "https://sites.google.com/site/virtualcide/virtualc_1.8.0_i386.deb?attredirects=0" -O virtualc.deb
+dpkg --add-architecture i386
+apt-get -yq install gdebi
+gdebi --n virtualc.deb
+rm virtualc.deb
+
+echo "end of chroot"
