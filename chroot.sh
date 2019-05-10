@@ -59,6 +59,8 @@ sed -i -- 's/#autologin-guest=false/autologin-guest=true/g' /etc/lightdm/lightdm
 sed -i -- 's/#PasswordAuthentication yes/PasswordAuthentication no/g' /etc/ssh/sshd_config
 sed -i -- 's/#PermitRootLogin prohibit-password/PermitRootLogin prohibit-password/g' /etc/ssh/sshd_config
 
+echo "set -o vi" >> /root/.bashrc
+
 echo "virtualc"
 
 wget "https://sites.google.com/site/virtualcide/virtualc_1.8.0_i386.deb?attredirects=0" -O virtualc.deb
