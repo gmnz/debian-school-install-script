@@ -9,13 +9,15 @@ echo -n "root passwd: "
 read -s passwd
 echo
 
-umount /dev/sda? || echo "sda unmounted"
+dsize=$(fdisk -l | grep "Disk /dev/sd" | awk -F":" '{ print $2 }' | awk -F"GiB" '{ print $1 }' | awk -F"." '{ print $1 }' | sort -n | tail -n 1 | tr -d ' ')
+tdisk=$(fdisk -l | grep "Disk /dev/sd" | grep $dsize | awk -F "Disk" '{ print $2 }' | awk -F":" '{ print $1 }' | tr -d ' ')
+dsize=$(parted $tdisk -- p | head -n 2 | tail -n 1 | awk '{ print $3 }' | awk -F'GB' '{ print $1 }')
+
+umount ${tdisk}? || echo "$tdisk unmounted"
 echo
 
-dsize=$(fdisk -l | grep "Disk /dev/sd" | awk -F":" '{ print $2 }' | awk -F"GiB" '{ print $1 }' | awk -F"." '{ print $1 }' | sort -n | tail -n 1 | tr -d ' ')
-
 #(fdisk -l /dev/sda)=$(fdisk -l /dev/sda)
-linpart=$(echo "$(fdisk -l /dev/sda)" | grep -e Linux | grep -v "Linux swap" | awk '{ print $1 }')
+linpart=$(echo "$(fdisk -l $tdisk)" | grep -e Linux | grep -v "Linux swap" | awk '{ print $1 }')
 #dsize=$(parted /dev/sda -s -- p | grep Disk | head -n 1 | awk '{ print $3 }' | awk -F'G' '{ print $1 }'| awk -F'.' '{ print $1 }')
 
 #if there are more Linux partitions delete it all
@@ -28,15 +30,30 @@ linpart=$(echo "$(fdisk -l /dev/sda)" | grep -e Linux | grep -v "Linux swap" | a
 #cat fsdjaflsdj
 
 if [ -z "$linpart" ]; then
-  	pend=$(parted /dev/sda -s -- p | tail -n 2 | head -n 1 | awk '{ print $3 }' | awk -F. '{ print $1 }' | awk -F'G' ' { print $1 }')
-	while ((echo $pend | grep -qv MB) && [ $pend != "End" ]); do
-	  if [ $((dsize - pend)) -lt 25 ]; then
-	    PARTN=$(echo "$(fdisk -l /dev/sda)" | grep sda | grep -v Disk | wc -l)
-	    echo "Deleting partition $PARTN..."
-	    parted /dev/sda -s -- rm $PARTN
-	    pend=$(parted /dev/sda -s -- p | tail -n 2 | head -n 1 | awk '{ print $3 }' | awk -F. '{ print $1 }' | awk -F'G' ' { print $1 }')
-	  fi
-	done
+  	pend=$(parted $tdisk -s -- p | tail -n 2 | head -n 1 | awk '{ print $3 }' | awk -F. '{ print $1 }' | awk -F'G' ' { print $1 }')
+	partype=$(parted $tdisk -- p | tail -n 2 | head -n 1 | awk '{ print $6 }')
+
+	if [ $pend -eq $dsize]; then
+		if [ $partype == "ntfs" ]; then
+			winpart=$(fdisk -l $tdisk | tail -n 1 | awk '{ print $1 }')
+			mount $winpart /mnt
+			avail=$(df -h /mnt/ | tail -n 1 | awk '{ print $4 }' | awk -F"G" '{ print $1 }')
+			umount $winpart
+			if [ $avail -gt 54 ]; then
+				yes | parted ---pretend-input-tty $tdisk resizepart ${winpart: -1} "$((pend-54))GB"
+			fi
+		fi
+
+	fi
+
+	#while ((echo $pend | grep -qv MB) && [ $pend != "End" ]); do
+	#  if [ $((dsize - pend)) -lt 25 ]; then
+	#    PARTN=$(echo "$(fdisk -l /dev/sda)" | grep sda | grep -v Disk | wc -l)
+	#    echo "Deleting partition $PARTN..."
+	#    parted /dev/sda -s -- rm $PARTN
+	#    pend=$(parted /dev/sda -s -- p | tail -n 2 | head -n 1 | awk '{ print $3 }' | awk -F. '{ print $1 }' | awk -F'G' ' { print $1 }')
+	#  fi
+	#done
         #elif echo "$(fdisk -l /dev/sda)" | grep -q -e FAT -e NTFS; then
         #  pend=$(parted /dev/sda -s -- p | tail -n 2 | head -n 1 | awk '{ print $3 }' | awk -F. '{ print $1 }' | awk -F'G' ' { print $1 }')
         #  if [ $pend -eq $dsize ]; then
