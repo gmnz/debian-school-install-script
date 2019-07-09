@@ -10,13 +10,14 @@ echo $3 > /etc/hostname
 ln -sf /usr/share/zoneinfo/Europe/Bratislava /etc/localtime
 echo "root:$4"|chpasswd
 
+apt update
+export DEBIAN_FRONTEND=noninteractive
 apt-get -yq install locales
 sed -i -- 's/# sk_SK.UTF-8 UTF-8/sk_SK.UTF-8 UTF-8/g' /etc/locale.gen
 locale-gen
 echo LANG=sk_SK.UTF-8 > /etc/locale.conf
 export LANG=sk_SK.UTF-8 
 
-export DEBIAN_FRONTEND=noninteractive
 apt-get -yq install linux-image-amd64 grub-pc
 grub-install /dev/sda
 grub-mkconfig -o /boot/grub/grub.cfg
@@ -34,7 +35,7 @@ EOL
 sed -i "s/--class gnu --class os/--class gnu --class os --unrestricted/g" /etc/grub.d/10_linux
 update-grub
 
-apt-get -yq install task-lxde-desktop neovim openssh-server x11vnc git codeblocks codeblocks-contrib g++ unattended-upgrades geany geany-plugins gedit gedit-plugins bluefish bluefish-plugins
+apt-get -yq install task-lxde-desktop neovim openssh-server x11vnc git codeblocks codeblocks-contrib g++ unattended-upgrades geany geany-plugins gedit gedit-plugins bluefish bluefish-plugins colordiff
 
 ./scratch2-install.sh
 
@@ -44,11 +45,11 @@ chmod +x /etc/rc.local
 chmod +x /etc/guest-session/skel/.bin/*
 
 cd /etc/lightdm/
-git clone https://gist.github.com/pixline/6981710 
-cd 6981710
-mv guest-account.sh ../
-cd ..
-rm -rf 6981710
+#git clone https://gist.github.com/pixline/6981710 
+#cd 6981710
+#mv guest-account.sh ../
+#cd ..
+#rm -rf 6981710
 chmod +x /etc/lightdm/guest-account.sh
 sed -i -- 's/#guest-account-script=guest-account/guest-account-script=\/etc\/lightdm\/guest-account.sh/g' /etc/lightdm/lightdm.conf
 sed -i -- 's/#greeter-hide-users=false/greeter-hide-users=true/g' /etc/lightdm/lightdm.conf
@@ -72,5 +73,16 @@ dpkg --add-architecture i386
 apt-get -yq install gdebi
 gdebi --n virtualc.deb
 rm virtualc.deb
+
+apt -yq install apache2 php7.0 mariadb-client mariadb-server php-mbstring php-gettext phpmyadmin
+a2enmod userdir
+adduser --disabled-password --gecos "" server
+sed -i 's/php_admin_flag engine Off/php_admin_flag engine On/g' /etc/apache2/mods-available/php7.0.conf 
+phpenmod mbstring
+grep "Include /etc/phpmyadmin/apache.conf" /etc/apache2/apache2.conf || echo "Include /etc/phpmyadmin/apache.conf" >> /etc/apache2/apache2.conf 
+runuser -l server -c 'mkdir ~/public_html'
+runuser -l server -c 'chmod o+x ~'
+runuser -l server -c 'chmod o+x ~/public_html/'
+runuser -l server -c 'chmod -R o+r ~/public_html/'
 
 echo "end of chroot"
