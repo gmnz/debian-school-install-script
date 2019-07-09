@@ -32,18 +32,20 @@ linpart=$(echo "$(fdisk -l $tdisk)" | grep -e Linux | grep -v "Linux swap" | awk
 if [ -z "$linpart" ]; then
   	pend=$(parted $tdisk -s -- p | tail -n 2 | head -n 1 | awk '{ print $3 }' | awk -F. '{ print $1 }' | awk -F'G' ' { print $1 }')
 	partype=$(parted $tdisk -- p | tail -n 2 | head -n 1 | awk '{ print $6 }')
+	freespace=$((dsize-pend))
 
-	if [ $pend -eq $dsize]; then
+	if [ $freespace -lt 54 ]; then
 		if [ $partype == "ntfs" ]; then
 			winpart=$(fdisk -l $tdisk | tail -n 1 | awk '{ print $1 }')
 			mount $winpart /mnt
 			avail=$(df -h /mnt/ | tail -n 1 | awk '{ print $4 }' | awk -F"G" '{ print $1 }')
 			umount $winpart
-			if [ $avail -gt 54 ]; then
-				yes | parted ---pretend-input-tty $tdisk resizepart ${winpart: -1} "$((pend-54))GB"
+			if [ $avail -ge 54 ]; then
+				#https://jfearn.fedorapeople.org/fdocs/en-US/Documentation/0.1/html/Fedora_Multiboot_Guide/freespace-ntfs.html
+				yes | parted ---pretend-input-tty $tdisk resizepart ${winpart: -1} "$((pend - 54 + freespace))GB"
+				pend=$((pend-54))
 			fi
 		fi
-
 	fi
 
 	#while ((echo $pend | grep -qv MB) && [ $pend != "End" ]); do
@@ -71,20 +73,22 @@ if [ -z "$linpart" ]; then
         #  psize=$((dsize-4))
         #  parted /dev/sda -s -- mklabel msdos
 	#fi
-	pend=$(parted /dev/sda -s -- p | tail -n 2 | head -n 1 | awk '{ print $3 }')
-	#echo $pend
-	if [ $pend == "End" ]; then
-		pend=1
-		unit=MiB
-	fi
 
-	psize=$((dsize-5))
-        parted /dev/sda -s -- mkpart extended $pend$unit 100%
-	if [ $pend == "1" ]; then
-		pend=2
-	fi
-        parted /dev/sda -s -- mkpart logical ext4 $pend$unit $psize"GB"
-        parted /dev/sda -s -- mkpart logical linux-swap $psize"GB" 100%
+
+	#pend=$(parted /dev/sda -s -- p | tail -n 2 | head -n 1 | awk '{ print $3 }')
+	##echo $pend
+	#if [ $pend == "End" ]; then
+	#	pend=1
+	#	unit=MiB
+	#fi
+
+	#psize=$((dsize-5))
+	parted $tdisk -s -- mkpart extended "${pend}GB" "${dsize}GB"
+	#if [ $pend == "1" ]; then
+	#	pend=2
+	#fi
+	parted $tdisk -s -- mkpart logical ext4 "${pend}GB" "$((pend+50))GB"
+	parted $tdisk -s -- mkpart logical linux-swap "$((pend+50))GB" 100%
 fi
 
 swapp=$(echo "$(fdisk -l /dev/sda)" | grep "Linux swap" | awk '{ print $1 }')
