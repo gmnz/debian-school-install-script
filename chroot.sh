@@ -34,7 +34,7 @@ EOL
 sed -i "s/--class gnu --class os/--class gnu --class os --unrestricted/g" /etc/grub.d/10_linux
 update-grub
 
-apt-get -yq install task-lxde-desktop vim openssh-server x11vnc git codeblocks codeblocks-contrib g++ unattended-upgrades geany geany-plugins gedit gedit-plugins bluefish bluefish-plugins
+apt-get -yq install task-lxde-desktop neovim openssh-server x11vnc git codeblocks codeblocks-contrib g++ unattended-upgrades geany geany-plugins gedit gedit-plugins bluefish bluefish-plugins
 
 ./scratch2-install.sh
 
