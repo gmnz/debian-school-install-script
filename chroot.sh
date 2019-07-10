@@ -33,6 +33,12 @@ EOF
 EOL
 
 sed -i "s/--class gnu --class os/--class gnu --class os --unrestricted/g" /etc/grub.d/10_linux
+premka="$(grep "^  CLASS.*\"" 30_os-prober)"
+linu="$(grep -n "^  CLASS.*\"" 30_os-prober)"
+linu="$(echo $linu | awk -F":" '{ print $1 }')"
+sed -i "/^  CLASS.*\"/d" 30_os-prober
+premka="${premka::-1} --unrestricted\""
+sed -i "${linu}i \ $premka" 30_os-prober
 update-grub
 
 apt-get -yq install task-lxde-desktop neovim openssh-server x11vnc git codeblocks codeblocks-contrib g++ unattended-upgrades geany geany-plugins gedit gedit-plugins bluefish bluefish-plugins colordiff
