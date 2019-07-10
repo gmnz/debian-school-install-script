@@ -91,4 +91,6 @@ runuser -l server -c 'chmod o+x ~'
 runuser -l server -c 'chmod o+x ~/public_html/'
 runuser -l server -c 'chmod -R o+r ~/public_html/'
 
+echo -e "\ndeb http://deb.debian.org/debian stretch-backports contrib" >> /etc/apt/sources.list
+
 echo "end of chroot"
