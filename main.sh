@@ -42,8 +42,18 @@ if [ -z "$linpart" ]; then
 			umount $winpart
 			if [ $avail -ge 54 ]; then
 				#https://jfearn.fedorapeople.org/fdocs/en-US/Documentation/0.1/html/Fedora_Multiboot_Guide/freespace-ntfs.html
-				yes | parted ---pretend-input-tty $tdisk resizepart ${winpart: -1} "$((pend - 54 + freespace))GB"
-				pend=$((pend-54))
+				yes | ntfsresize --size "$((pend - 54 + freespace))G" $winpart
+				ntfsfix -d $winpart
+				clustersize=$(ntfsinfo -m $winpart|grep "Cluster Size:" | awk -F":" '{ print $2 }' | tr -d ' ')
+				clustervolsize=$(ntfsinfo -m $winpart|grep "Volume Size in Clusters:" | awk -F":" '{ print $2 }' | tr -d ' ')
+				sectorsize=$(parted $tdisk unit s print | grep "Sector size (logical" | awk -F":" '{ print $2 }' | awk -F"/" '{ print $1 }' | awk -F"B" '{ print $1 }' | tr -d ' ')
+				partstart=$(parted $tdisk unit s print | tail -n 2 | head -n 1 | awk '{ print $2 }' | tr -d ' ')
+				partstart=${partstart:: -1}
+				partend=$((clustersize * clustervolsize / sectorsize + partstart))
+				parted $tdisk -- rm ${winpart: -1}
+				#yes | parted ---pretend-input-tty $tdisk resizepart ${winpart: -1} "$((pend - 54 + freespace))GB"
+				parted $tdisk -- mkpart primary ntfs "${partstart}s" "${partend}s"
+				pend=$((pend-54+freespace))
 			fi
 		fi
 	fi
@@ -83,13 +93,14 @@ if [ -z "$linpart" ]; then
 	#fi
 
 	#psize=$((dsize-5))
-	parted $tdisk -s -- mkpart extended "${pend}GB" "${dsize}GB"
-	#if [ $pend == "1" ]; then
-	#	pend=2
-	#fi
-	parted $tdisk -s -- mkpart logical ext4 "${pend}GB" "$((pend+50))GB"
-	parted $tdisk -s -- mkpart logical linux-swap "$((pend+50))GB" 100%
 fi
+
+parted $tdisk -s -- mkpart extended "${pend}GB" "${dsize}GB"
+#if [ $pend == "1" ]; then
+#	pend=2
+#fi
+parted $tdisk -s -- mkpart logical ext4 "${pend}GB" "$((pend+50))GB"
+parted $tdisk -s -- mkpart logical linux-swap "$((pend+50))GB" 100%
 
 swapp=$(echo "$(fdisk -l /dev/sda)" | grep "Linux swap" | awk '{ print $1 }')
 linpart=$(echo "$(fdisk -l /dev/sda)" | grep -e Linux | grep -v "Linux swap" | awk '{ print $1 }')
