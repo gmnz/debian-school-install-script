@@ -95,7 +95,7 @@ if [ -z "$linpart" ]; then
 	#psize=$((dsize-5))
 fi
 
-parted $tdisk -s -- mkpart extended "${pend}GB" "${dsize}GB"
+parted $tdisk -s -- mkpart extended "${pend}GB" 100%
 #if [ $pend == "1" ]; then
 #	pend=2
 #fi
