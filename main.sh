@@ -102,15 +102,15 @@ parted $tdisk -s -- mkpart extended "${pend}GB" 100%
 parted $tdisk -s -- mkpart logical ext4 "${pend}GB" "$((pend+50))GB"
 parted $tdisk -s -- mkpart logical linux-swap "$((pend+50))GB" 100%
 
-swapp=$(echo "$(fdisk -l /dev/sda)" | grep "Linux swap" | awk '{ print $1 }')
-linpart=$(echo "$(fdisk -l /dev/sda)" | grep -e Linux | grep -v "Linux swap" | awk '{ print $1 }')
+swapp=$(echo "$(fdisk -l $tdisk)" | grep "Linux swap" | awk '{ print $1 }')
+linpart=$(echo "$(fdisk -l $tdisk)" | grep -e Linux | grep -v "Linux swap" | awk '{ print $1 }')
 
 yes | mkfs.ext4 $linpart
 #starts even if it makes no sense
 #mkfs.ext4 -F $linpart
 
 if [ -n "$(swapon -s)" ]; then swapoff $swapp; fi
-if [ -z "$swapp" ]; then
+if [ -n "$swapp" ]; then
 	yes | mkswap $swapp
 	swapon $swapp
 fi
