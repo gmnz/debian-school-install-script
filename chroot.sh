@@ -41,7 +41,7 @@ premka="${premka::-1} --unrestricted\""
 sed -i "${linu}i \ $premka" /etc/grub.d/30_os-prober
 update-grub
 
-apt-get -yq install task-lxde-desktop neovim openssh-server x11vnc git codeblocks codeblocks-contrib g++ unattended-upgrades geany geany-plugins gedit gedit-plugins bluefish bluefish-plugins colordiff
+apt-get -yq install task-lxde-desktop neovim openssh-server x11vnc git codeblocks codeblocks-contrib g++ unattended-upgrades geany geany-plugins gedit gedit-plugins bluefish bluefish-plugins colordiff idle-python3.5
 
 ./scratch2-install.sh
 
@@ -92,5 +92,6 @@ runuser -l server -c 'chmod o+x ~/public_html/'
 runuser -l server -c 'chmod -R o+r ~/public_html/'
 
 echo -e "\ndeb http://deb.debian.org/debian stretch-backports contrib" >> /etc/apt/sources.list
+apt-get -yq -t stretch-backports install virtualbox
 
 echo "end of chroot"
