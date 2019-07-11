@@ -129,6 +129,7 @@ cp -r guest-session /mnt/etc/
 mkdir /mnt/root/.ssh
 cp authorized_keys /mnt/root/.ssh/authorized_keys
 cp rc.local /mnt/etc/
+cp guest-account.sh /mnt/etc/lightdm/
 
 chmod +x chroot.sh	
 cp chroot.sh /mnt/chroot.sh 
