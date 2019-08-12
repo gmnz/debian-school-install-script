@@ -93,14 +93,15 @@ if [ -z "$linpart" ]; then
 	#fi
 
 	#psize=$((dsize-5))
-fi
 
-parted $tdisk -s -- mkpart extended "${pend}GB" 100%
-#if [ $pend == "1" ]; then
-#	pend=2
-#fi
-parted $tdisk -s -- mkpart logical ext4 "${pend}GB" "$((pend+50))GB"
-parted $tdisk -s -- mkpart logical linux-swap "$((pend+50))GB" 100%
+	parted $tdisk -s -- mkpart extended "${pend}GB" 100%
+	#if [ $pend == "1" ]; then
+	#	pend=2
+	#fi
+	parted $tdisk -s -- mkpart logical ext4 "${pend}GB" "$((pend+50))GB"
+	parted $tdisk -s -- mkpart logical linux-swap "$((pend+50))GB" 100%
+
+fi
 
 swapp=$(echo "$(fdisk -l $tdisk)" | grep "Linux swap" | awk '{ print $1 }')
 linpart=$(echo "$(fdisk -l $tdisk)" | grep -e Linux | grep -v "Linux swap" | awk '{ print $1 }')
