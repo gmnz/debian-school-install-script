@@ -56,6 +56,7 @@ cd /etc/lightdm/
 #mv guest-account.sh ../
 #cd ..
 #rm -rf 6981710
+mv /etc/guest-account.sh /etc/lightdm/
 chmod +x /etc/lightdm/guest-account.sh
 sed -i -- 's/#guest-account-script=guest-account/guest-account-script=\/etc\/lightdm\/guest-account.sh/g' /etc/lightdm/lightdm.conf
 sed -i -- 's/#greeter-hide-users=false/greeter-hide-users=true/g' /etc/lightdm/lightdm.conf
